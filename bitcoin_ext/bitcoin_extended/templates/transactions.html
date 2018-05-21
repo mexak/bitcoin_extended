@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<ul>
+{% for addr in address %}
+     Address: {{ addr.address }} <br>
+{% endfor %}
+
+    {% for trans in transactions %}
+    transaction_id: {{ trans.tx_index }} time: {{ trans.time }} size: {{ trans.size }} <br>
+    {% endfor %}
+
+</ul>
+
+{% endblock %}
+
+
+
