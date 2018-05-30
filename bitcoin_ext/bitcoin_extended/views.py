@@ -6,6 +6,7 @@ import requests
 from django.shortcuts import render
 from .forms import AddressForm, TimesForm
 from django.http import HttpResponseRedirect
+import datetime
 
 
 def address_view(request):
@@ -28,7 +29,8 @@ def address_view(request):
                 a = Address.objects.get(address=addr)
 
                 for i in range(len(r.json()['txs'])):
-                    time = r.json()['txs'][i]['time']
+                    time_unix = r.json()['txs'][i]['time']
+                    time = datetime.datetime.utcfromtimestamp(time_unix).strftime('%Y-%m-%dT%H:%M:%SZ')
                     tx_id = r.json()['txs'][i]['tx_index']
                     size = r.json()['txs'][i]['size']
                     a.transactions_set.create(time=time, tx_index=tx_id, size=size)
@@ -37,16 +39,16 @@ def address_view(request):
 
 def times_view(request):
     if request.method == 'GET':
-        form = TimesForm(request.GET)
+        form_b = TimesForm(request.GET)
         return render(request, 'address.html', {'form_b': form_b})
 
 
-
-def transactions_view(request):
     #show information on transactions of address from AddressForm
+def transactions_view(request):
     addr = request.session.get('addr')
     address = Address.objects.filter(address=addr)
     transactions = Transactions.objects.filter(address__address=addr)
+
     context = {'address': address,
                'transactions': transactions}
 
@@ -56,3 +58,5 @@ def transactions_view(request):
 
 
 
+
+# datetime.datetime.utcfromtimestamp(posix_time).strftime('%Y-%m-%dT%H:%M:%SZ')
